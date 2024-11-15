@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,28 +15,51 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-
-const formSchema = z.object({
-  fullName: z.string().min(2).max(50),
-});
+import Link from "next/link";
 
 type FormType = "sign-in" | "sign-up";
+
+const authFormSchema = (formType: FormType) => {
+  return z.object({
+    email: z.string().email(),
+    fullName:
+      formType === "sign-up"
+        ? z
+            .string()
+            .min(
+              3,
+              "Full name is required and should have at least 3 character."
+            )
+        : z.string().optional(),
+  });
+};
 const AuthForm = ({ type }: { type: FormType }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage,setErrorMessage] = useState();
+  const [errorMessage, setErrorMessage] = useState();
+  const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      fullName: "",
+      email: "",
     },
   });
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
   };
+
+  const onError = (error: any) => {
+    console.error(error);
+    setErrorMessage(error.message);
+    setIsLoading(false);
+  };
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="auth-form">
+        <form
+          onSubmit={form.handleSubmit(onSubmit, onError)}
+          className="auth-form"
+        >
           <h1 className="form-title">
             {type === "sign-in" ? "Sign In" : "Sign Up"}
           </h1>
@@ -81,7 +103,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="form-submit-button" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="form-submit-button"
+            disabled={isLoading}
+          >
             {type === "sign-in" ? "Sign In" : "Sign Up"}
             {isLoading && (
               <Image
@@ -95,7 +121,17 @@ const AuthForm = ({ type }: { type: FormType }) => {
           </Button>
           {errorMessage && <p className="error-message">*{errorMessage}</p>}
           <div className="body-2 flex justify-center">
-<p>{type === 'sign-in' ? "Don't have an account?" :"Already have an account?"}</p>
+            <p className="text-light-100">
+              {type === "sign-in"
+                ? "Don't have an account?"
+                : "Already have an account?"}
+            </p>
+            <Link
+              href={type === "sign-in" ? "/sign-up" : "/sign-in"}
+              className="ml-1 font-bold text-brand"
+            >
+              {type === "sign-in" ? "Sign In" : "Sign  Up"}
+            </Link>
           </div>
         </form>
       </Form>

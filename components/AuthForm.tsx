@@ -57,7 +57,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
         fullName: values.fullName || "",
         email: values.email,
       });
-
       setAccountId(user.accountId);
     } catch (error: any) {
       console.log(error);
@@ -156,7 +155,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
       </Form>
       {/* <h1>OTP Verification</h1> */}
 
-      {true && (
+      {accountId && (
         <OTPModal email={form.getValues("email")} accountId={accountId} />
       )}
     </>

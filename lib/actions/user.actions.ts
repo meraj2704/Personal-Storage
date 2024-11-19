@@ -27,7 +27,7 @@ export const sendEmailOTP = async ({ email }: { email: string }) => {
   try {
     const session = await account.createEmailToken(ID.unique(), email);
     console.log("Email token response:", session);
-    return session?.$id || null;
+    return session?.userId || null;
   } catch (error) {
     // console.error(error);
     handleError(error, "Failed to send OTP");
@@ -72,6 +72,8 @@ export const verifyOTP = async ({
   accountId: string;
   password: string;
 }) => {
+  console.log("accountId: " + accountId);
+  console.log("password: " + password);
   try {
     const { account } = await createAdminClient();
     const session = await account.createSession(accountId, password);

@@ -21,12 +21,15 @@ import { useRouter } from "next/navigation";
 const OTPModal = ({
   accountId,
   email,
+  open,
+  setIsOpen,
 }: {
-  accountId: string ;
+  accountId: string;
   email: string;
+  open: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }) => {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(true);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -36,19 +39,19 @@ const OTPModal = ({
       const sessionId = await verifyOTP({ accountId, password });
       if (sessionId) {
         router.push("/");
+        setIsOpen(false);
       }
     } catch (error: any) {
       console.log("Failed to verify OTP.", error);
     }
     setIsLoading(false);
-    setIsOpen(false);
   };
 
   const resendOTP = async () => {
     await sendEmailOTP({ email });
   };
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={open} onOpenChange={setIsOpen}>
       <AlertDialogContent className="shad-alert-dialog">
         <AlertDialogHeader className="relative flex justify-center">
           <AlertDialogTitle className="h2 text-center">

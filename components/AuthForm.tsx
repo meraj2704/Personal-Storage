@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -39,6 +39,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [accountId, setAccountId] = useState(null);
+  const [isOpen, setIsOpen] = useState(true);
+
+  useEffect(() => {
+    console.log("account id", accountId);
+  }, [accountId]);
 
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,7 +62,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
         fullName: values.fullName || "",
         email: values.email,
       });
-      setAccountId(user.accountId);
+      // console.log("user", user)
+      setAccountId(user);
+      if (user) {
+        setIsOpen(true);
+      }
     } catch (error: any) {
       console.log(error);
       setErrorMessage("Failed to create account. Please try again.");
@@ -156,7 +165,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
       {/* <h1>OTP Verification</h1> */}
 
       {accountId && (
-        <OTPModal email={form.getValues("email")} accountId={accountId} />
+        <OTPModal
+          email={form.getValues("email")}
+          accountId={accountId}
+          open={isOpen}
+          setIsOpen={setIsOpen}
+        />
       )}
     </>
   );
